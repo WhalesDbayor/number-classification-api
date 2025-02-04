@@ -19,32 +19,32 @@ const isPrime = (num) => {
 
 // Function to check if a number is perfect
 const isPerfect = (num) => {
-    let sum = 1;
-    for (let i = 2; i <= Math.sqrt(num); i++) {
-        if (num % i === 0) {
-            sum += i;
-            if (i !== num / i) sum += num / i;
-        }
-    }
-    return sum === num && num !== 1;
+  let sum = 1;
+  for (let i = 2; i <= Math.sqrt(num); i++) {
+      if (num % i === 0) {
+          sum += i;
+          if (i !== num / i) sum += num / i;
+      }
+  }
+  return sum === num && num !== 1;
 };
 
 // Function to check if a number is an Armstrong number
 const isArmstrong = (num) => {
-    const digits = num.toString().split(""),
-          length = digits.length;
-    const sum = digits.reduce((acc, digit) => acc + Math.pow(parseInt(digit), length), 0);
-    return sum === num;
+  const digits = num.toString().split(""),
+        length = digits.length;
+  const sum = digits.reduce((acc, digit) => acc + Math.pow(parseInt(digit), length), 0);
+  return sum === num;
 };
 
 // Function to get a fun fact from Numbers API
 const getFunFact = async (num) => {
-    try {
-        const response = await axios.get(`http://numbersapi.com/${num}/math`);
-        return response.data;
-    } catch (error) {
-        return "No fun fact available.";
-    }
+  try {
+      const response = await axios.get(`http://numbersapi.com/${num}/math`);
+      return response.data;
+  } catch (error) {
+      return "No fun fact available.";
+  }
 };
 
 // Number classification API endpoint
