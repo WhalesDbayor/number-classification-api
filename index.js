@@ -48,28 +48,99 @@ const getFunFact = async (num) => {
 };
 
 // Number classification API endpoint
+// app.get("/api/classify-number", async (req, res) => {
+//     const { number } = req.query;
+//     const num = parseInt(number);
+
+//     if (isNaN(num)) {
+//         return res.status(400).json({ number, error: true });
+//     }
+
+//     const properties = [];
+//     if (isArmstrong(num)) properties.push("armstrong");
+//     properties.push(num % 2 === 0 ? "even" : "odd");
+
+//     const funFact = await getFunFact(num);
+
+//     res.json({
+//         number: num,
+//         is_prime: isPrime(num),
+//         is_perfect: isPerfect(num),
+//         properties,
+//         digit_sum: num.toString().split("").reduce((sum, digit) => sum + parseInt(digit), 0),
+//         fun_fact: funFact,
+//     });
+// });
+
 app.get("/api/classify-number", async (req, res) => {
-    const { number } = req.query;
-    const num = parseInt(number);
+  let { number } = req.query;
 
-    if (isNaN(num)) {
-        return res.status(400).json({ number, error: true });
-    }
+  // Convert to integer
+  number = parseInt(number, 10);
 
-    const properties = [];
-    if (isArmstrong(num)) properties.push("armstrong");
-    properties.push(num % 2 === 0 ? "even" : "odd");
+  // Validate input
+  if (isNaN(number)) {
+      return res.status(400).json({
+          number: req.query.number,
+          error: true,
+          message: "Please provide a valid integer."
+      });
+  }
 
-    const funFact = await getFunFact(num);
+  const absNumber = Math.abs(number); // Ensure absolute value for certain calculations
 
-    res.json({
-        number: num,
-        is_prime: isPrime(num),
-        is_perfect: isPerfect(num),
-        properties,
-        digit_sum: num.toString().split("").reduce((sum, digit) => sum + parseInt(digit), 0),
-        fun_fact: funFact,
-    });
+  // Check if Armstrong number
+  const isArmstrong = (num) => {
+      const digits = num.toString().split("").map(Number);
+      const power = digits.length;
+      const sum = digits.reduce((acc, d) => acc + Math.pow(d, power), 0);
+      return sum === num;
+  };
+
+  // Check if Prime
+  const isPrime = (num) => {
+      if (num < 2) return false;
+      for (let i = 2; i <= Math.sqrt(num); i++) {
+          if (num % i === 0) return false;
+      }
+      return true;
+  };
+
+  // Check if Perfect Number
+  const isPerfect = (num) => {
+      if (num <= 0) return false;
+      let sum = 0;
+      for (let i = 1; i <= num / 2; i++) {
+          if (num % i === 0) sum += i;
+      }
+      return sum === num;
+  };
+
+  // Compute digit sum (ignoring negative sign)
+  const digitSum = absNumber.toString().split("").reduce((acc, digit) => acc + parseInt(digit, 10), 0);
+
+  // Fetch Fun Fact (using absolute value)
+  let funFact = "No fact available.";
+  try {
+      const response = await axios.get(`http://numbersapi.com/${absNumber}/math`);
+      funFact = response.data;
+  } catch (error) {
+      console.error("Error fetching fun fact:", error.message);
+  }
+
+  // Determine properties
+  let properties = number % 2 === 0 ? ["even"] : ["odd"];
+  if (isArmstrong(absNumber)) properties.unshift("armstrong");
+
+  // Return Response
+  return res.json({
+      number: number, // Return the original number (including negative)
+      is_prime: isPrime(absNumber), // Check primality with absolute value
+      is_perfect: isPerfect(absNumber), // Check perfection with absolute value
+      properties: properties,
+      digit_sum: digitSum, // Ensure valid digit sum
+      fun_fact: funFact // Use absolute number fact but return it normally
+  });
 });
 
 // Start server
