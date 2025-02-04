@@ -81,7 +81,7 @@ app.get("/api/classify-number", async (req, res) => {
   // Validate input
   if (isNaN(number)) {
       return res.status(400).json({
-          number: req.query.number,
+          number: "alphabet",
           error: true,
           // message: "Please provide a valid integer."
       });
