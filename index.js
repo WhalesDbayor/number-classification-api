@@ -9,43 +9,43 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 
 // function to check if a number is prime
-const isPrime = (num) => {
-  if (num < 2) return false;
-  for (let i = 2; i <= Math.sqrt(num); i++) {
-    if (num % i === 0) return false;
-  }
-  return true;
-};
+// const isPrime = (num) => {
+//   if (num < 2) return false;
+//   for (let i = 2; i <= Math.sqrt(num); i++) {
+//     if (num % i === 0) return false;
+//   }
+//   return true;
+// };
 
 // Function to check if a number is perfect
-const isPerfect = (num) => {
-  let sum = 1;
-  for (let i = 2; i <= Math.sqrt(num); i++) {
-      if (num % i === 0) {
-          sum += i;
-          if (i !== num / i) sum += num / i;
-      }
-  }
-  return sum === num && num !== 1;
-};
+// const isPerfect = (num) => {
+//   let sum = 1;
+//   for (let i = 2; i <= Math.sqrt(num); i++) {
+//       if (num % i === 0) {
+//           sum += i;
+//           if (i !== num / i) sum += num / i;
+//       }
+//   }
+//   return sum === num && num !== 1;
+// };
 
 // Function to check if a number is an Armstrong number
-const isArmstrong = (num) => {
-  const digits = num.toString().split(""),
-        length = digits.length;
-  const sum = digits.reduce((acc, digit) => acc + Math.pow(parseInt(digit), length), 0);
-  return sum === num;
-};
+// const isArmstrong = (num) => {
+//   const digits = num.toString().split(""),
+//         length = digits.length;
+//   const sum = digits.reduce((acc, digit) => acc + Math.pow(parseInt(digit), length), 0);
+//   return sum === num;
+// };
 
-// Function to get a fun fact from Numbers API
-const getFunFact = async (num) => {
-  try {
-      const response = await axios.get(`http://numbersapi.com/${num}/math`);
-      return response.data;
-  } catch (error) {
-      return "No fun fact available.";
-  }
-};
+// // Function to get a fun fact from Numbers API
+// const getFunFact = async (num) => {
+//   try {
+//       const response = await axios.get(`http://numbersapi.com/${num}/math`);
+//       return response.data;
+//   } catch (error) {
+//       return "No fun fact available.";
+//   }
+// };
 
 // Number classification API endpoint
 // app.get("/api/classify-number", async (req, res) => {
@@ -83,7 +83,7 @@ app.get("/api/classify-number", async (req, res) => {
       return res.status(400).json({
           number: req.query.number,
           error: true,
-          message: "Please provide a valid integer."
+          // message: "Please provide a valid integer."
       });
   }
 
@@ -121,11 +121,18 @@ app.get("/api/classify-number", async (req, res) => {
 
   // Fetch Fun Fact (using absolute value)
   let funFact = "No fact available.";
-  try {
-      const response = await axios.get(`http://numbersapi.com/${absNumber}/math`);
-      funFact = response.data;
-  } catch (error) {
-      console.error("Error fetching fun fact:", error.message);
+
+  if (number < 0 && !isArmstrong(absNumber)) {
+    // Generic fun fact for negative numbers (except Armstrong numbers)
+    funFact = "Negative numbers are interesting, but they don't have fun facts like positive ones!";
+  } else {
+    // Specific fun facts for each type of number
+    try {
+        const response = await axios.get(`http://numbersapi.com/${absNumber}/math`);
+        funFact = response.data;
+    } catch (error) {
+        console.error("Error fetching fun fact:", error.message);
+    }
   }
 
   // Determine properties
